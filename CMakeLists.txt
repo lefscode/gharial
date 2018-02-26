@@ -14,6 +14,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/json/include
 ${CMAKE_CURRENT_SOURCE_DIR}/src
 ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/hashidsxx
 ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/pistache/include
+${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Clara/include
 )
 #include_directories (${CMAKE_CURRENT_SOURCE_DIR}/src)
 
