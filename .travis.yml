@@ -25,5 +25,4 @@ before_script:
   - if [ "$COMPILER" = "g++-6"        ]; then export CXX="g++-6" CC="gcc-6";              fi
 
 script:
-  - git submodule init --update
   - mkdir build-release && cd build-release && cmake -DCMAKE_BUILD_TYPE=Release && cmake --build .
