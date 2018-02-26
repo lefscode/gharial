@@ -1,0 +1,29 @@
+os: linux
+dist: trusty
+sudo: require
+language: cpp
+
+addons:
+  apt:
+    sources:
+      - llvm-toolchain-precise-3.9
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-6
+      - g++-6
+
+matrix:
+  include:
+    - compiler: gcc
+      env: COMPILER=g++-6
+
+
+before_install:
+  - if [ "$TRAVIS_OS_NAME" = "linux"  ]; then sudo apt-get -qq update;    fi
+
+before_script:
+  - if [ "$COMPILER" = "g++-6"        ]; then export CXX="g++-6" CC="gcc-6";              fi
+
+script:
+  - git submodule init --update
+  - mkdir build-release && cd build-release && cmake -DCMAKE_BUILD_TYPE=Release && cmake --build .
