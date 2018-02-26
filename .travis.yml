@@ -25,4 +25,4 @@ before_script:
   - if [ "$COMPILER" = "g++-6"        ]; then export CXX="g++-6" CC="gcc-6";              fi
 
 script:
-  - mkdir build-release && cd build-release && cmake -DCMAKE_BUILD_TYPE=Release && cmake --build .
+  - mkdir build-release && cd build-release && cmake -DCMAKE_BUILD_TYPE=Release .. && make
