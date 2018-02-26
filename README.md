@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/lefscode/gharial.svg?branch=master)](https://travis-ci.org/lefscode/gharial)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/nlohmann/json/master/LICENSE.MIT)
+
+
 
 ## Basic Overview
 
