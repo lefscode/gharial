@@ -11,6 +11,8 @@ addons:
     packages:
       - gcc-6
       - g++-6
+      - lcov
+        
 
 matrix:
   include:
@@ -25,4 +27,15 @@ before_script:
   - if [ "$COMPILER" = "g++-6"        ]; then export CXX="g++-6" CC="gcc-6";              fi
 
 script:
-  - mkdir build-release && cd build-release && cmake -DCMAKE_BUILD_TYPE=Release .. && make
+  - mkdir build && cd build && cmake -DGHARIAL_BUILD_TESTS=ON .. && make
+  - ./run_test-01
+
+after_success:
+    # Creating report
+  - cd ${TRAVIS_BUILD_DIR}
+  - lcov --directory . --capture --output-file coverage.info # capture coverage info
+  - lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
+  - lcov --list coverage.info #debug info
+  # Uploading report to CodeCov
+  - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+
