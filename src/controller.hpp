@@ -1,14 +1,7 @@
 #ifndef GHARIAL_CONTROL_HPP
 #define GHARIAL_CONTROL_HPP
-#include "hashids.h"
 
-#include <algorithm>
-#include <vector>
-#include "pistache/http.h"
-#include "pistache/router.h"
-#include "pistache/endpoint.h"
-#include "nlohmann/json.hpp"
-
+#include "internal.hpp"
 
 using json = nlohmann::json;
 
@@ -49,89 +42,40 @@ private:
 
     void encode( const Rest::Request& request, Http::ResponseWriter response ) {
 
-        try { 
-        
-            auto body = json::parse(request.body());
-            std::vector<uint64_t> v;
-            v.clear();       
+        std::string e; 
+        json r = json::object();
 
-            if ( !body["numbers"].is_null() 
-                  && body["numbers"].is_array() 
-                  && body["numbers"].size() < 11) {
+        Http::Code c = internal_encode (request.body(), r, e);
 
-                for (auto& element : body["numbers"]) {
-                    
-                    if ( element.is_number_unsigned() )
-                        v.push_back(element.get<uint64_t>());
-                    else {
-                        //Not_Acceptable
-                        response.send(Http::Code::Not_Acceptable, "Only unsigned numbers allowed");
-                    }
-                } 
-
-
-            } else {
-            
-                response.send(Http::Code::Not_Acceptable, "Invalid body. numbers array is missing or has wrong data type");
-
-            }
-
-            //hash operation 
-
-            if ( v.size() > 10 ) 
-                response.send(Http::Code::Not_Acceptable, "Invalid body. numbers array should have at most 10 unsigned integers");
-            
-            hashidsxx::Hashids hash;
-            std::string out = hash.encode(v.begin(), v.end());
-
-            json reply = json::object();
-            reply["output"] = out;
+        if ( c == Http::Code::Ok ) {
 
             response.setMime(MIME(Application, Json));
-            response.send(Http::Code::Ok, reply.dump());
+            response.send(c, r.dump());
 
-        } catch (...) {
-    
-            response.send(Http::Code::Internal_Server_Error, "Server error occurred when encoding");
-        } 
+        } else {
+        
+            response.send(c, e);
 
+        }
     }
 
     void decode( const Rest::Request& request, Http::ResponseWriter response ) {
 
-        try { 
+        std::string e; 
+        json r = json::object();
+
+        Http::Code c = internal_decode (request.body(), r, e);
+
+        if ( c == Http::Code::Ok ) {
+
+            response.setMime(MIME(Application, Json));
+            response.send(c, r.dump());
+
+        } else {
         
-            hashidsxx::Hashids hash;
-            std::string input;
-            std::vector<uint64_t> numbers;
-            numbers.clear();
+            response.send(c, e);
 
-            auto body = json::parse(request.body());
-            
-            if ( !body["input"].is_null() 
-                  && body["input"].is_string() ) { 
-
-                json reply = json::object();
-
-                input = body["input"].get<std::string>();                
-                numbers = hash.decode(input);
-                json j_vec(numbers);
-
-                reply["numbers"] = j_vec; 
-
-                response.setMime(MIME(Application, Json));
-                response.send(Http::Code::Ok, reply.dump());
-
-            } else {
-            
-                response.send(Http::Code::Not_Acceptable, "Invalid body. decode method, input field should be string");
-
-            }
-
-        } catch (...) {
-    
-            response.send(Http::Code::Internal_Server_Error, "Server error occurred when decoding");
-        } 
+        }
 
     }
 
